@@ -1,13 +1,12 @@
-module.exports = function(app) {
-  var taskList = require('../controllers/taskController');
+const router = express.Router()
 
-  app.route('/tasks')
-    .get(taskList.all_tasks)
-    .post(taskList.create_task);
+const taskList = require('../controllers/taskController');
 
-
-  app.route('/tasks/:taskId')
-    .get(taskList.load_task)
-    .put(taskList.update_task)
-    .delete(taskList.delete_task);
-};
+router.route('/tasks')
+  .get(taskList.all_tasks)
+  .post(taskList.create_task)
+router.route('/tasks/:taskId')
+  .get(taskList.load_task)
+  .put(taskList.update_task)
+  .delete(taskList.delete_task)
+export default Routes
