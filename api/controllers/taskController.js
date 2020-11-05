@@ -1,53 +1,74 @@
-var mongoose = require("mongoose"),
-  Task = mongoose.model("Tasks");
+const mongoose = require("mongoose"),
+const Task = mongoose.model("Tasks");
 
 // 全てのタスクを取得する。
-exports.all_tasks = function(req, res) {
-  Task.find({}, function(err, task) {
-    if (err) res.send(err);
-    res.json(task);
-  });
-};
+const all_tasks = async (req, res) => {
+  await Task.find({})
+  .exec()
+  .then(tasks => {
+    res.json(tasks)
+  })
+  .catch(err => {
+    res.send(err)
+  })
+}
 
 // 新しいタスクを作成する。
-exports.create_task = function(req, res) {
-  var new_task = new Task(req.body);
-  new_task.save(function(err, task) {
-    if (err) res.send(err);
-    res.json(task);
-  });
-};
+const create_task = async (req, res) => {
+  const task = new Task()
+  task.name = req.body.name
+  task.Created_date = req.body.Created_date
+  await task.save()
+  .then(task => res.json(task))
+  .catch(err => {
+    res.send(err)
+    console.error(err)
+  })
+}
+
 
 // 特定のタスクを取得する。
-exports.load_task = function(req, res) {
-  Task.findById(req.params.taskId, function(err, task) {
-    if (err) res.send(err);
-    res.json(task);
-  });
-};
+const load_task = async (req, res) => {
+  await Task.findById(req.params.taskId)
+  .exec()
+  .then(task => {
+    res.json(task)
+  })
+  .catch(err => {
+    res.send(err)
+  })
+}
 
 // 特定のタスクを更新する。
-exports.update_task = function(req, res) {
-  Task.findOneAndUpdate(
-    { _id: req.params.taskId },
-    req.body,
-    { new: true },
-    function(err, task) {
-      if (err) res.send(err);
-      res.json(task);
-    }
-  );
-};
+const update_task = async (req, res) => {
+  const result =  await Task.findById(req.params.taskId)
+  .exec()
+  .then(task => {
+    task.name = req.body.name
+    task.Created_date = req.body.Created_date
+    return task
+  })
+  .catch(err => {
+    res.send(err)
+  })
+
+  await result.save()
+  .exec()
+  .then(task => {
+    res.json(task)
+  })
+  .catch(err => {
+    res.send(err)
+  })
+}
 
 // 特定のタスクを削除する。
-exports.delete_task = function(req, res) {
-  Task.remove(
-    {
-      _id: req.params.taskId
-    },
-    function(err, task) {
-      if (err) res.send(err);
-      res.json({ message: "Task successfully deleted" });
-    }
-  );
-};
+const delete_task = async (req, res) => {
+  await User.deleteOne({
+    _id: req.params.taskId
+  })
+    .exec()
+    .then(() => res.json({ message: "Successfully deleted"}))
+    .catch(err => res.send(err))
+}
+export default taskControllers
